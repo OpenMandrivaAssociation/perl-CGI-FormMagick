@@ -46,7 +46,6 @@ BuildRequires:	perl(Text::Template)
 BuildRequires:  perl(Class::ParamParser)
 BuildRequires:  perl(Mail::RFC822::Address)
 BuildArch:	noarch
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 FormMagick is a toolkit for easily building fairly complex form-based

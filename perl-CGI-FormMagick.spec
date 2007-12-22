@@ -5,7 +5,7 @@
 Summary:	CGI-FormMagick module for perl 
 Name:		perl-%{real_name}
 Version:	0.91
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPL or Artistic
 Group:		Development/Perl
 # http://sourceforge.net/projects/formmagick/

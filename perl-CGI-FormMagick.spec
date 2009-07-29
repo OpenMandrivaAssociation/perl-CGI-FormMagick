@@ -1,17 +1,19 @@
+%define upstream_name    CGI-FormMagick
+%define upstream_version 0.91
+
 %define _provides_exceptions perl(Ness::ted)
 
-%define real_name CGI-FormMagick
+Name:       perl-%{upstream_name}
+Version:    %perl_convert_version %{upstream_version}
+Release:    %mkrel 1
 
 Summary:	CGI-FormMagick module for perl 
-Name:		perl-%{real_name}
-Version:	0.91
-Release:	%mkrel 6
-License:	GPL or Artistic
+License:	GPL+ or Artistic
 Group:		Development/Perl
 # http://sourceforge.net/projects/formmagick/
-URL:		http://search.cpan.org/dist/%{real_name}
+Url:		http://search.cpan.org/dist/%{upstream_name}
 # http://gd.tuwien.ac.at/platform/linux/e-smith/devel/SRPMS/perl-CGI-FormMagick-0.91-26.src.rpm
-Source0:	perl-%{real_name}-%{version}.tar.bz2
+Source0:	perl-%{upstream_name}-%{upstream_version}.tar.bz2
 Patch0:		perl-CGI-FormMagick-0.91-02.mitel_patch
 Patch1:		perl-CGI-FormMagick-0.91-03.mitel_patch
 Patch2:		perl-CGI-FormMagick-0.91-04.mitel_patch
@@ -35,7 +37,7 @@ Patch19:	perl-CGI-FormMagick-0.91-24.mitel_patch
 Patch20:	perl-CGI-FormMagick-0.91-25.mitel_patch
 Patch100:	perl-CGI-FormMagick-0.91-export_names.diff
 Patch101:	perl-CGI-FormMagick-0.91-version.diff
-BuildRequires:	perl-devel
+
 BuildRequires:  perl(CGI::Persistent)
 BuildRequires:  perl(Text::Iconv)
 BuildRequires:  perl(Test::Inline)
@@ -46,7 +48,7 @@ BuildRequires:	perl(Text::Template)
 BuildRequires:  perl(Class::ParamParser)
 BuildRequires:  perl(Mail::RFC822::Address)
 BuildArch:	noarch
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}
 
 %description
 FormMagick is a toolkit for easily building fairly complex form-based
@@ -55,8 +57,7 @@ multi-page "wizard" style form using XML, then display that form using
 only a few lines of Perl.
 
 %prep
-
-%setup -q -n perl-%{real_name}-%{version}
+%setup -q -n perl-%{upstream_name}-%{upstream_version}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -101,7 +102,3 @@ rm -rf %{buildroot}
 %{perl_vendorlib}/CGI/FormMagick
 %{perl_vendorlib}/CGI/FormMagick.pm
 %{_mandir}/*/*
-
-
-
-

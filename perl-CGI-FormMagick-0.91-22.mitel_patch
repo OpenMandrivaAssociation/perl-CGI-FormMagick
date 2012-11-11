@@ -1,0 +1,149 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm:1.4 perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm:1.5
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm:1.4	Fri Aug 20 19:42:07 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm	Tue Mar 29 18:14:41 2005
+@@ -201,7 +201,21 @@
+ 
+     if ( defined $params{comma_delimited_args} )
+     {
+-        push @args, split /,\s*/, $params{comma_delimited_args};
++        while ($params{comma_delimited_args} && $params{comma_delimited_args} =~ s/
++                ^                   # start of string
++                \s*                 # skip spaces
++                (                   # start of arg ($1)
++                    \"\"            # empty string
++                |   \".*?[^\\]\"    # non-empty string
++                |   \'\'            # empty string
++                |   \'.*?[^\\]\'    # non-empty string
++                |   \w*             # non quoted word
++                )                   # end of arg ($1)
++                (?:\s*[,;]\s*)?     # validation separation
++                //x)
++        {
++            push @args, $1;
++        }
+     }
+ 
+     my $sub = $self->get_sub( $package, $sub_name );
+Index: perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.6 perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.7
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.6	Tue Aug  3 11:43:56 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm	Tue Mar 29 18:14:41 2005
+@@ -18,7 +18,6 @@
+ our @ISA = qw( Exporter );
+ our @EXPORT  = qw( 
+     do_validation_routine
+-    parse_validation_routine
+     call_user_validation
+     call_fm_validation
+ 
+@@ -139,13 +138,13 @@
+ 
+ =item *
+ 
+-You B<MUST> put a comma then a space between routine names, eg
+-C<my_routine, my_other_routine> B<NOT> C<my_routine,my_other_routine>.
++You B<MUST> put a comma or a space between routine names, eg
++C<my_routine, my_other_routine> B<OR> C<my_routine my_other_routine>.
+ 
+ =item *
+ 
+-You B<MUST NOT> put a space between args to a routine, eg
+-C<my_routine(1,2,3)> B<NOT> C<my_routine(1, 2, 3)>.
++You B<MUST> put a comma between args to a routine, eg
++C<my_routine(1,2,3)>.
+ 
+ =back
+ 
+@@ -297,25 +296,35 @@
+     # just skip everything else if there's no validation to do.
+     return "OK" unless $validation;
+ 
+-    my @results;
+-    # XXX argh! this split statement requires that we write validators like 
+-    # "lengthrange(4, 10), word" like "lengthrange(4,10), word" in order to 
+-    # work. Eeek. That's not how this should work. But it was even
+-    # more broken before (I changed a * to a +). 
+-    # OTOH, I'm not sure it's fixed now. --srl
+-
+-    my @validation_routines = split( /,\s+/, $validation);
+-    $self->debug_msg("Going to perform these validation routines: @validation_routines");
+-
+-    foreach my $v (@validation_routines) {
+-        my ($validator, $arg) = $self->parse_validation_routine($v);
+-        my $result = $self->do_validation_routine($validator, $fielddata, $arg);
++    $self->debug_msg("Going to perform these validation routines: $validation") if $validation;
+ 
++    my @results;
++    while ($validation && $validation =~ s/
++            ^                           # start of string
++            \s*                         # skip spaces
++            (\w+)                       # Function name ($1)
++            (?:                         #
++                \(                      # literal '('
++                \s*                     # skip spaces
++                (                       # start of args ($2)
++                (?:                     # start of many args
++                    (?:                 # start of arg
++                        \"\"            # empty string
++                    |   \".*?[^\\]\"    # non-empty string
++                    |   \'\'            # empty string
++                    |   \'.*?[^\\]\'    # non-empty string
++                    |   \w*             # non quoted word
++                    )?                  # arg optional
++                    (?:\s*[,;]\s*)?     # arg separation
++                )*                      # can have many args
++                )                       # end of args ($2)
++                \)                      # literal ')'
++            )?                          # entire (args) optional
++            (?:\s*[,;]\s*)?             # validation separation
++            //x)
++    {
++        my $result = $self->do_validation_routine($1, $fielddata, $2);
+         push (@results, $result) if $result ne "OK";
+-
+-        # for multiple errors, put semicolons between the errors before
+-        # shoving them in a hash to return.    
+-
+     }
+ 
+     if (@results) {
+@@ -529,38 +538,6 @@
+ The following methods are probably not of interest to anyone except
+ developers of FormMagick
+ 
+-
+-=head2 parse_validation_routine ($validation_routine_name)
+-
+-parse the name of a validation routine into its name and its parameters.
+-returns a 2-element list, $validator and $arg.
+-
+-=for testing
+-my @rv = $fm->parse_validation_routine("foo(1,2)");
+-is($rv[0], "foo", "Pick up validation routine name");
+-is($rv[1], "1,2", "Pick up validation routine args");
+-
+-=cut
+-
+-sub parse_validation_routine {
+-    my ($self, $validation_routine_name) = @_;
+-    
+-    my ($validator, $arg) = ($validation_routine_name =~ 
+-        m/
+-        ^       # start of string
+-        (\w+)   # a word (--> $validator)
+-        (?:     # non-capturing (to group the (.*))
+-        \(      # literal paren
+-        (.*)    # whatever's inside the paren (--> $arg)
+-        \)      # literal close paren
+-        )?      # (.*) is optional (zero or one of them)
+-        $       # end of string
+-        /x );
+-
+-    return ($validator, $arg);
+-}
+-
+-=pod
+ 
+ =head2 do_validation_routine ($self, $validator, $fielddata, $args)
+ 

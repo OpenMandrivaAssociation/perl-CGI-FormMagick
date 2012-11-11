@@ -1,0 +1,30 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/L10N.pm:1.2 perl-CGI-FormMagick/lib/CGI/FormMagick/L10N.pm:1.3
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/L10N.pm:1.2	Wed Dec 18 16:27:28 2002
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/L10N.pm	Wed Oct 22 11:54:38 2003
+@@ -270,17 +270,15 @@
+             $lexicons{$lexlang} = [ $lex ];
+         }
+     }
+-
+-
+-
+-    my %thislex = ();
+-    PL: foreach my $pl (@preferred_languages) {
+-        if ($lexicons{$pl}) {
+-            %thislex = $self->clean_lexicon(@{$lexicons{$pl}});
+-            last PL;
+-        }
++    # Merge the hashes by preferred language order.
++    my %lexicon_merged = ();
++    foreach my $pl (reverse @preferred_languages)
++    {
++        %lexicon_merged = (%lexicon_merged, 
++                           $self->clean_lexicon(@{$lexicons{$pl}}))
++           if exists $lexicons{$pl};
+     }
+-    return %thislex;
++    return %lexicon_merged;
+ }
+ 
+ =head2 _set_lexicon_params(@lexicons)

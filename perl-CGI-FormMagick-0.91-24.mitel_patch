@@ -1,0 +1,17 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.21 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.22
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.21	Tue Sep 28 11:12:38 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Tue May 17 15:21:25 2005
+@@ -755,12 +755,6 @@
+ a list of validation functions; see L<CGI::FormMagick::Validator> for more
+ information on this subject.
+ 
+-=item validation-error-message
+-
+-an error message to present to the user if validation fails.
+-CGI::FormMagick::Validator provides one by default, but you may prefer
+-to override it.
+-
+ =item options 
+ 
+ A list of options required for a select list or radio buttons; see below for 

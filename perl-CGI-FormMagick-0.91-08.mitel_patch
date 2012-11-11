@@ -1,0 +1,25 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/Validator/Basic.pm:1.2 perl-CGI-FormMagick/lib/CGI/FormMagick/Validator/Basic.pm:1.3
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/Validator/Basic.pm:1.2	Wed Dec 18 16:27:28 2002
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/Validator/Basic.pm	Wed Jan 28 15:24:47 2004
+@@ -111,10 +111,18 @@
+ sub number {
+     my ($fm, $data) = @_;
+     defined($data) or return "This field must contain a number";
++    my $errmsg = "This field must contain a number";
+     if ($data =~ /^-?[0-9.]+$/) {
++        # Make sure there's only one period.
++        my @periods = ($data =~ /\./g);
++        if (@periods > 1)
++        {
++            return $errmsg;
++        }
+         return "OK";
+-    } else {
+-        return "This field must contain a number";
++    }
++    else {
++        return $errmsg;
+     }
+ }
+ 

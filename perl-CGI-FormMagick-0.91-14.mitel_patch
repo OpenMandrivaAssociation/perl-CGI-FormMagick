@@ -1,0 +1,87 @@
+Index: perl-CGI-FormMagick/FormMagick.dtd
+diff -u perl-CGI-FormMagick/FormMagick.dtd:1.3 perl-CGI-FormMagick/FormMagick.dtd:1.4
+--- perl-CGI-FormMagick/FormMagick.dtd:1.3	Tue Jan 14 11:55:28 2003
++++ perl-CGI-FormMagick/FormMagick.dtd	Thu Jul 15 11:49:12 2004
+@@ -28,8 +28,8 @@
+ <!ATTLIST FORM POST-EVENT	CDATA	#IMPLIED	>
+ 
+ <!-- A page must have a title and at least one field, and may also
+-optionally contain fragments. Various other information about pages is
+-kept in attributes. -->
++optionally contain fragments, or a menu. Various other information about pages
++is kept in attributes. -->
+ 
+ <!ELEMENT PAGE (TITLE,FIELD+,FRAGMENT*)>
+ 
+@@ -37,6 +37,7 @@
+ <!ATTLIST PAGE PAGE-TEMPLATE 	CDATA	#IMPLIED	>
+ <!ATTLIST PAGE PRE-EVENT 	CDATA	#IMPLIED	>
+ <!ATTLIST PAGE POST-EVENT 	CDATA	#IMPLIED	>
++<!ATTLIST PAGE MENU 	CDATA	#IMPLIED	>
+ 
+ <!-- Fields within a page must have a label, and may optionally have a
+ description.  All the other field-related information is in attributes.
+@@ -55,6 +56,7 @@
+ <!ATTLIST FIELD SIZE        CDATA   #IMPLIED    >
+ <!ATTLIST FIELD ROWS        CDATA   #IMPLIED    >
+ <!ATTLIST FIELD COLS        CDATA   #IMPLIED    >
++<!ATTLIST FIELD DISPLAY     CDATA   #IMPLIED    >
+ 
+ <!-- An HTML fragment contains CDATA for HTML to put in that place -->
+ 
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.18 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.19
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.18	Thu Jul 15 10:52:00 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Thu Jul 15 11:45:02 2004
+@@ -773,6 +773,12 @@
+ 
+ For select fields, height; for text and textarea fields, length.
+ 
++=item display
++
++This attribute is a callback to a function that returns true or false. If
++true, the field is displayed, and validated during form submission. If false,
++it is not.
++
+ =back
+ 
+ =head2 Notes on parsing of value attribute
+Index: perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.14 perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.15
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.14	Mon May 10 09:40:09 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm	Thu Jul 15 11:45:02 2004
+@@ -276,6 +276,13 @@
+             my $output = $fm->do_external_routine($info->{src}) || "";
+             print qq(\n    <tr><td cols="2">$output</td></tr>\n) if $output;
+         } else {
++            # If there is a display function, call it. If it doesn't return
++            # true, skip this field.
++            if ($info->{display})
++            {
++                my $display = $fm->do_external_routine($info->{display});
++                next unless $display;
++            }
+             $fm->print_field_description($info->{description}) if $info->{description};
+ 
+             if (($info->{type} eq "select") || ($info->{type} eq "radio")) {
+Index: perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.4 perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.5
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.4	Thu Jul 15 10:52:00 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm	Thu Jul 15 11:45:02 2004
+@@ -436,6 +436,16 @@
+     my $this_page = $self->form->{pages}->[$page_index];
+ 
+     foreach my $field (@{$this_page->{fields}}) {
++        # If the field has a display attribute, call it like a callback, and
++        # don't validate it if it's false.
++        my $info = $self->gather_field_info($field);
++        if ($info->{display})
++        {
++            $self->debug_msg("This field has a display attribute.  Calling...");
++            my $display = $self->do_external_routine($info->{display});
++            next unless $display;
++        }
++        $self->debug_msg("Validating field...");
+         my $result = $self->validate_field($field);
+         unless ($result eq "OK") {
+             $errors{$field->{label}} = $result;

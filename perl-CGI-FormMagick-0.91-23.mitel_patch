@@ -1,0 +1,21 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.15 perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.16
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.15	Thu Jul 15 11:45:02 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm	Tue Mar 29 18:17:20 2005
+@@ -453,7 +453,15 @@
+         ) .  $tagmaker->select_end;
+ 
+     # nasty hack required here to select the desired value if it's preset
+-        $inputfield =~ s/(<OPTION VALUE="$value")/$1 SELECTED/;
++        if (ref($value) eq 'ARRAY') {
++            foreach (@$value) {
++                $inputfield =~ s/(<OPTION VALUE="$_")/$1 SELECTED/;
++            }
++        } else {
++            foreach (split /\s*[;,]\s*/, $value) {
++                $inputfield =~ s/(<OPTION VALUE="$_")/$1 SELECTED/;
++            }
++        }
+ 
+     } elsif ($info->{type} eq "radio") {
+         my @labels = map { $fm->localise($_) } @{$info->{option_labels}};

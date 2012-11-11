@@ -1,0 +1,75 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.14 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.15
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.14	Mon May 10 09:40:08 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Tue Jul 13 17:29:06 2004
+@@ -378,8 +378,8 @@
+     my $skip = $ashash->{skip_header} ? 1 : 0;
+ 
+     if ($skip) {
+-    $self->page_post_event;
+-    return;
++        $self->page_post_event;
++        return;
+     }
+ 
+     print $self->{cgi}->header;
+@@ -400,6 +400,7 @@
+     # Check whether they clicked "Previous" or something else
+     # If they clicked previous, we avoid validation etc.  See
+     # doc/pageflow.dia for details
++    # FIXME - no such file in package
+ 
+     if ($self->{cgi}->param("Previous")) {
+         $self->{page_number} = $self->pop_page_stack();
+@@ -414,8 +415,8 @@
+     $self->print_form_header();
+ 
+     if ($self->finished()) {
+-    $self->validate_all();
+-    $self->form_post_event();
++        $self->validate_all();
++        $self->form_post_event();
+     } else {
+         $self->page_pre_event(); 
+         $self->print_page();
+@@ -866,6 +867,30 @@
+     return $self->{cgi}->param("wherenext");
+ }
+ 
++=head2 novalidate
++
++Often, you want to provide the ability to navigate to a new page without
++validating the last page. When that is the case, you should set the
++'novalidate' CGI param, which is checked with this method, and then deleted to
++prevent is being remembered for the next submission.
++
++=begin testing
++
++$cgi = CGI->new({ novalidate => "foo" });
++local $fm->{cgi} = $cgi;
++is($fm->novalidate(), 1, "novalidate CGI param is set");
++
++=end testing
++
++=cut
++
++sub novalidate
++{
++    my $self = shift;
++    my $novalidate = $self->{cgi}->param("novalidate") ? 1 : 0;
++    $self->{cgi}->delete("novalidate") if $novalidate;
++    return $novalidate;
++}
+ 
+ =head2 prepare_for_next_page
+ 
+@@ -928,7 +953,8 @@
+ sub prepare_for_next_page {
+     my ($self) = @_;
+ 
+-    $self->validate_page($self->{page_number});
++    $self->validate_page($self->{page_number})
++        unless $self->novalidate();
+ 
+     unless ($self->errors()) {
+         # ONLY do the page post event if the form passes validation

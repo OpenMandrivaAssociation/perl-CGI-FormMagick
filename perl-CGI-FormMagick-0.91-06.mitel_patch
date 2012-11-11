@@ -1,0 +1,38 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.11 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.12
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.11	Fri Sep  5 13:57:11 2003
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Wed Nov 19 14:24:39 2003
+@@ -176,18 +176,8 @@
+     #$self->{sessiondir} = initialise_sessiondir($args{SESSIONDIR});
+     $self->{calling_package} = (caller)[0]; 
+     $self->{fallback_language} = undef;
+-
+-    {
+-        local $^W = 0;
+-        # create a session-handling CGI object
+-        $self->{cgi} = new CGI::Persistent $self->{sessiondir};
+-    }
+-
+     $self->munge_fm_obj();
+ 
+-    # And parse the xml for the page and the lexicon.
+-    $self->parse_xml();
+-    
+     return $self;
+ }
+ 
+@@ -367,6 +357,14 @@
+ 
+ sub display {
+     my $self = shift;
++
++    $self->parse_xml();
++
++    {
++        local $^W = 0;
++        # create a session-handling CGI object
++        $self->{cgi} = new CGI::Persistent $self->{sessiondir};
++    }
+ 
+     # debug thingy, to check L10N lexicons, only if you need it
+     $self->check_l10n() if $self->{cgi}->param('checkl10n');

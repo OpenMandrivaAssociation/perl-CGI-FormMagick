@@ -1,0 +1,264 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.17 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.18
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.17	Wed Jul 14 17:47:11 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Thu Jul 15 10:52:00 2004
+@@ -1229,7 +1229,8 @@
+     }
+ 
+     @args = ($self, @args);
+-    CGI::FormMagick::Sub::call(
++    $self->debug_msg("calling $routine in package $self->{calling_package}");
++    $self->sub_call(
+         package => $self->{calling_package},
+         sub => $routine,
+         args => \@args
+Index: perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm:1.2 perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm:1.3
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm:1.2	Wed Jul 14 17:47:11 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm	Thu Jul 15 10:52:00 2004
+@@ -17,7 +17,7 @@
+ 
+ =head1 SYNOPSIS
+ 
+-    use CGI::FormMagick::Sub;
++    use CGI::FormMagick;
+     my %sub = (
+         package => $some_package_name,
+         sub => $some_sub_name,
+@@ -25,41 +25,55 @@
+         comma_delimited_args => $string_of_comma_delimited_args,
+     );
+ 
+-    CGI::FormMagick::Sub::exists(%sub) or return undef;
+-    return CGI::FormMagick::Sub::call(%sub);
++    $f = CGI::FormMagick->new();
++
++    $f->sub_exists(%sub) or return undef;
++    $f->sub_call(%sub);
+ 
+ =head1 DESCRIPTION
+ 
+ (Intended for internal use only.)
+ 
+-Used for calling subs whose names are dynamically generated.
++Used for calling subs whose names are dynamically generated. Note, FormMagick
++inherits from this class. It is never intended to be instantiated directly,
++and has no constructor. It's purpose is to provide methods, nothing more, like
++a mix-in class.
+ 
+ =head1 STATIC METHODS
+ 
+-=head2 exists(...)
+-
+-exists() takes a hash with keys "package" and "sub".  Returns true if
+-the sub exists, false otherwise.
+-
+-=head2 call(...)
++=head2 sub_exists(...)
+ 
+-call() takes a hash with keys "package" and "sub", and optional "args" and
+-"comma_delimited_args".  The "comma_delimited_args" are split up and
+-pushed into the array of args to be sent to the sub when called.  Returns
+-the return of the called sub itself.
++sub_exists() takes a hash with keys "package" and "sub".  Returns true if
++the sub exists, false otherwise. "package" need not be defined. If the
++subroutine is not found in "package", or "package" is undef, the current
++object is searched using UNIVERSAL::can. 
++
++=head2 sub_call(...)
++
++sub_call() takes a hash with keys "package" and "sub", and optional "args" and
++"comma_delimited_args".  The "comma_delimited_args" are split up and pushed
++into the array of args to be sent to the sub when called.  Returns the return
++of the called sub itself. "package" need not be defined. If the subroutine is
++not found in "package", or "package" is undef, the current object is searched
++using UNIVERSAL::can.
+ 
+-If the sub doesn't exist, it will return undef.  If $^W is true, it will
+-also complain.
++If the sub doesn't exist, it will throw a fatal exception with a stack
++backtrace.
+ 
+ =cut
+ 
+ package CGI::FormMagick::Sub;
+ 
+ use Carp;
++use Exporter;
++
++our @ISA = qw( Exporter );
++our @EXPORT = qw(sub_call sub_exists get_sub);
+ 
+ =begin testing
+ BEGIN {
+     use_ok 'CGI::FormMagick::Sub';
++    use_ok 'CGI::FormMagick';
+ }
+ 
+ {
+@@ -166,7 +180,9 @@
+         $description .= '()';
+     }
+ 
+-    my $actual = CGI::FormMagick::Sub::call(%call_with);
++    my $f = CGI::FormMagick->new();
++
++    my $actual = $f->sub_call(%call_with);
+ 
+     is($actual, $expected, $description);
+ }
+@@ -175,21 +191,27 @@
+ 
+ =cut
+ 
+-sub call {
+-    my %params = @_;
+-    my $package = $params{package} || '';
++sub sub_call
++{
++    my $self     = shift;
++    my %params   = @_;
++    my $package  = $params{package} || '';
+     my $sub_name = $params{sub};
+-    my @args = exists $params{args} ? @{$params{args}} : ();
++    my @args     = exists $params{args} ? @{ $params{args} } : ();
+ 
+-    if (defined $params{comma_delimited_args}) {
++    if ( defined $params{comma_delimited_args} )
++    {
+         push @args, split /,\s*/, $params{comma_delimited_args};
+     }
+ 
+-    my $sub = get_sub($package, $sub_name);
++    my $sub = $self->get_sub( $package, $sub_name );
+ 
+-    if (defined $sub) {
++    if ( defined $sub )
++    {
+         return $sub->(@args);
+-    } else {
++    }
++    else
++    {
+         confess "FormMagick: Couldn't call '$package\:\:$sub_name'";
+     }
+ }
+@@ -202,7 +224,8 @@
+     { expected => 0, sub => 'shouldnt exist' },
+ ) {
+     my ($expected, $sub) = @{$expectations}{qw(expected sub)};
+-    my $actual = CGI::FormMagick::Sub::exists(
++    my $f = CGI::FormMagick->new();
++    my $actual = $f->sub_exists(
+         package => 'main',
+         sub => $sub
+     );
+@@ -217,18 +240,34 @@
+ 
+ =cut
+ 
+-sub exists {
++sub sub_exists {
++    my $self = shift;
+     my %params = @_;
+     my ($package, $sub) = @params{qw(package sub)};
+ 
+-    return defined get_sub($package, $sub) ? 1 : 0;
++    return defined $self->get_sub($package, $sub) ? 1 : 0;
+ }
+ 
+ sub get_sub {
++    my $self = shift;
+     my ($package, $sub) = @_;
+     no strict 'refs'; # Into the Evil Cavern... mwahahahahaaaaaa
+-    my $package_symbols = *{$package . '::'}{HASH};
+-    return $package_symbols->{$sub};
++    if ($package)
++    {
++        my $package_symbols = *{$package . '::'}{HASH};
++        if (exists $package_symbols->{$sub})
++        {
++            return $package_symbols->{$sub};
++        }
++    }
++    if ($self && $self->can($sub))
++    {
++        return $self->can($sub);
++    }
++    else
++    {
++        return undef;
++    }
+ }
+ 
+ return 1;
+Index: perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.3 perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.4
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.3	Wed Jul 14 17:47:11 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm	Thu Jul 15 10:52:00 2004
+@@ -305,7 +305,7 @@
+     # OTOH, I'm not sure it's fixed now. --srl
+ 
+     my @validation_routines = split( /,\s+/, $validation);
+-    # $self->debug_msg("Going to perform these validation routines: @validation_routines");
++    $self->debug_msg("Going to perform these validation routines: @validation_routines");
+ 
+     foreach my $v (@validation_routines) {
+         my ($validator, $arg) = $self->parse_validation_routine($v);
+@@ -574,13 +574,12 @@
+     my $cp = $self->{calling_package};
+ 
+     # TODO: this could use some documentation.
+-    # TODO: It could also use CGI::FormMagick::Sub::exists() directly?
+     $result = 
+         $self->call_user_validation($validator, $fielddata, $args) ||
+         $self->call_fm_validation  ($validator, $fielddata, $args);
+ 
+     if (!$result) {
+-        confess "Couldn't find validator $validator!";
++        confess "Validator $validator returned nothing";
+     }
+ 
+     $self->debug_msg("Validation result is $result");
+@@ -630,14 +629,21 @@
+     my ($self, $validator, $data, $args) = @_;
+ 
+     my %sub = (
++        self => $self,
+         package => $self->{calling_package},
+         sub => $validator,
+         args => [ $self, $data ],
+         comma_delimited_args => $args,
+     );
+ 
+-    CGI::FormMagick::Sub::exists(%sub) or return undef;
+-    return CGI::FormMagick::Sub::call(%sub);
++    if ($self->sub_exists(%sub))
++    {
++        return $self->sub_call(%sub);
++    }
++    else
++    {
++        confess "User validation method $validator does not exist";
++    }
+ }
+ 
+ =head2 $fm->call_fm_validation($routine, $data, $args)
+@@ -669,9 +675,14 @@
+         comma_delimited_args => $args,
+     );
+ 
+-    CGI::FormMagick::Sub::exists(%sub) or return undef;
+-
+-    return CGI::FormMagick::Sub::call(%sub);
++    if ($self->sub_exists(%sub))
++    {
++        return $self->sub_call(%sub);
++    }
++    else
++    {
++        confess "FormMagick Validator $validator does not exist";
++    }
+ }
+ 
+ 

@@ -1,0 +1,13 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.10 perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.11
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.10	Tue May  6 16:52:17 2003
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm	Wed Sep  3 10:41:54 2003
+@@ -275,7 +275,7 @@
+             if (($info->{type} eq "select") || ($info->{type} eq "radio")) {
+                 $fm->set_option_lv($info);
+             }
+-	    elsif ($info->{type} eq "literal")
++	    elsif (($info->{type} eq "literal") && (! $info->{label}))
+ 	    {
+ 		next;
+ 	    }

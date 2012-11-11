@@ -1,0 +1,44 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.10 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.11
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.10	Wed Sep  3 11:59:46 2003
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Fri Sep  5 13:57:11 2003
+@@ -177,14 +177,16 @@
+     $self->{calling_package} = (caller)[0]; 
+     $self->{fallback_language} = undef;
+ 
+-    # And parse the xml for the page and the lexicon.
+-    $self->parse_xml();
+-
+     {
+         local $^W = 0;
+         # create a session-handling CGI object
+         $self->{cgi} = new CGI::Persistent $self->{sessiondir};
+     }
++
++    $self->munge_fm_obj();
++
++    # And parse the xml for the page and the lexicon.
++    $self->parse_xml();
+     
+     return $self;
+ }
+@@ -331,6 +333,19 @@
+         return $self->{fallback_language};
+     }
+ }
++
++=pod
++
++=head2 munge_fm_obj()
++
++This function is called from the FormMagick constructor before parse_xml() is
++called.  It can be overridden by subclasses to provide arbitrary object
++munging, such as adding/removing pages dynamically depending on configuration
++data.  This is basically a hook for generic object munging.
++
++=cut
++
++sub munge_fm_obj {}
+ 
+ =pod
+ 

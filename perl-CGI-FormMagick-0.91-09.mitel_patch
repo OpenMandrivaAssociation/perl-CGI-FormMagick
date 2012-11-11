@@ -1,0 +1,103 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.13 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.14
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.13	Mon Jan  5 20:55:41 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Mon May 10 09:40:08 2004
+@@ -604,11 +604,26 @@
+ 
+ name (required)
+ 
++=item *
++
++pre-event=<func>
++
++=item *
++
++post-event=<func>
++
++=item *
++
++menu=<func>
++
+ =back
+ 
+ =head2 Example
+ 
+-    <page name="RoomType" post-event="check_availability">
++    <page
++        name="RoomType"
++        menu="show_menu()"
++        post-event="check_availability">
+       <description>
+         Please provide us with details of your preferred room.
+       </description>
+Index: perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.11 perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.14
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm:1.11	Wed Sep  3 10:41:54 2003
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/HTML.pm	Mon May 10 09:40:09 2004
+@@ -172,6 +172,7 @@
+     my $fm = shift;
+     my $title       = $fm->page->{title};
+     my $description = $fm->page->{description};
++    my $menu = $fm->page->{menu};
+     my $url = $fm->{cgi}->url(-relative => 1);
+     my $enctype = $fm->get_page_enctype();
+ 
+@@ -182,9 +183,14 @@
+     print qq(  <input type="hidden" name="page_stack" value="$fm->{page_stack}">\n);
+     print "  ",$fm->{cgi}->state_field(), "\n";	# hidden field with state ID
+     print "  <table class=\"sme-noborders\">\n";
+-    #print "    <col width=\"250\"><col width=\"*\">\n";
++
++    if ($menu)
++    {
++	my $output = $fm->do_external_routine($menu);
++	print "<tr><td colspan=\"2\"><p>$output</p></td></tr>\n";
++    }
++
+     if ($description) {
+-	  #print '<p class="pagedescription">', $fm->localise($description), "</p>\n";
+ 	  print "  <tr><td colspan=2><p>", $fm->localise($description), "</p></td>\n  </tr>\n";
+     }
+ }
+@@ -271,21 +277,21 @@
+             print qq(\n    <tr><td cols="2">$output</td></tr>\n) if $output;
+         } else {
+             $fm->print_field_description($info->{description}) if $info->{description};
+-        
++
+             if (($info->{type} eq "select") || ($info->{type} eq "radio")) {
+                 $fm->set_option_lv($info);
+             }
+-	    elsif (($info->{type} eq "literal") && (! $info->{label}))
+-	    {
+-		next;
+-	    }
++            elsif (($info->{type} eq "literal") && (! $info->{label}))
++            {
++                next;
++            }
+ 
+             print qq(    <tr>\n      <td class="sme-noborders-label">) . $fm->localise($info->{label}). "\n" ;
+             my $inputfield = $fm->build_inputfield($info);
+             # this is to make the printed HTML look nice
+             $inputfield =~ s#^\s*\n##g;
+             print  qq(      <td class="sme-noborders-content">$inputfield</td>\n    </tr>\n);
+-        
++
+             # display errors (if any) below the field label, taking up a whole row
+             my $error = $fm->{errors}->{$info->{label}};
+             $fm->print_field_error($error) if $error;
+@@ -356,11 +362,11 @@
+     if ($fm->{cgi}->param($f{id})) {
+         $f{value} = $fm->{cgi}->param($f{id});
+ 
+-    # are we calling a subroutine to find the value?
++        # are we calling a subroutine to find the value?
+     } elsif ($fieldinfo->{value} and $fieldinfo->{value} =~ /\(.*\)/) {
+         $f{value} = $fm->do_external_routine($fieldinfo->{value}); 
+ 
+-    # otherwise, use value attribute or default to blank.
++        # otherwise, use value attribute or default to blank.
+     } else {
+         my $default = ($fieldinfo->{type} eq 'checkbox' ? 1 : "");
+         if (defined $fieldinfo->{value}) {

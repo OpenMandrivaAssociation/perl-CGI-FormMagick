@@ -1,0 +1,120 @@
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Events.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Events.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Events.pm	2002-12-18 22:27:28.000000000 +0100
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Events.pm	2005-11-06 14:17:20.000000000 +0100
+@@ -10,7 +10,7 @@
+ # $Id: Events.pm,v 1.11 2002/02/19 17:54:18 skud Exp $
+ #
+ 
+-package    CGI::FormMagick;
++package    CGI::FormMagick::Events;
+ 
+ use strict;
+ use Carp;
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/HTML.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/HTML.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/HTML.pm	2003-05-06 22:52:17.000000000 +0200
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/HTML.pm	2005-11-06 14:17:20.000000000 +0100
+@@ -15,7 +15,7 @@
+ # $Id: HTML.pm,v 1.64 2002/06/24 17:56:35 skud Exp $
+ #
+ 
+-package    CGI::FormMagick;
++package    CGI::FormMagick::HTML;
+ 
+ use strict;
+ use Carp;
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/L10N.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/L10N.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/L10N.pm	2002-12-18 22:27:28.000000000 +0100
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/L10N.pm	2005-11-06 14:17:51.000000000 +0100
+@@ -6,7 +6,7 @@
+ # see the file COPYING for details.
+ 
+ 
+-package CGI::FormMagick;
++package CGI::FormMagick::L10N;
+ use I18N::LangTags;
+ use Text::Template 'fill_in_string';
+ use Text::Iconv;
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Setup.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Setup.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Setup.pm	2002-12-18 22:27:28.000000000 +0100
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Setup.pm	2005-11-06 14:17:20.000000000 +0100
+@@ -10,7 +10,7 @@
+ # $Id: Setup.pm,v 1.22 2002/04/25 16:42:35 segfault- Exp $
+ #
+ 
+-package    CGI::FormMagick;
++package    CGI::FormMagick::Setup;
+ 
+ use strict;
+ use Carp;
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Utils.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Utils.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Utils.pm	2002-12-18 22:27:28.000000000 +0100
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Utils.pm	2005-11-06 14:17:20.000000000 +0100
+@@ -10,7 +10,7 @@
+ # $Id: Utils.pm,v 1.30 2002/05/13 18:13:02 skud Exp $
+ #
+ 
+-package    CGI::FormMagick;
++package    CGI::FormMagick::Utils;
+ 
+ use Text::Template;
+ 
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Basic.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Basic.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Basic.pm	2002-12-18 22:27:28.000000000 +0100
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Basic.pm	2005-11-06 14:17:20.000000000 +0100
+@@ -10,7 +10,7 @@
+ # $Id: Basic.pm,v 1.6 2002/02/05 22:09:04 skud Exp $
+ #
+ 
+-package    CGI::FormMagick::Validator;
++package    CGI::FormMagick::Validator::Basic;
+ use strict;
+ 
+ =pod
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Business.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Business.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Business.pm	2002-12-18 22:27:28.000000000 +0100
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Business.pm	2005-11-06 14:17:20.000000000 +0100
+@@ -10,7 +10,7 @@
+ # $Id: Business.pm,v 1.8 2002/02/05 22:09:04 skud Exp $
+ #
+ 
+-package    CGI::FormMagick::Validator;
++package    CGI::FormMagick::Validator::Business ;
+ 
+ =pod
+ 
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Geography.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Geography.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Geography.pm	2002-12-18 22:27:28.000000000 +0100
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Geography.pm	2005-11-06 14:17:20.000000000 +0100
+@@ -8,7 +8,7 @@
+ # $Id: Geography.pm,v 1.2 2002/02/05 22:09:04 skud Exp $
+ #
+ 
+-package    CGI::FormMagick::Validator;
++package    CGI::FormMagick::Validator::Geography;
+ 
+ =pod
+ 
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Length.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Length.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Length.pm	2002-12-18 22:27:28.000000000 +0100
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Length.pm	2005-11-06 14:17:20.000000000 +0100
+@@ -10,7 +10,7 @@
+ # $Id: Length.pm,v 1.4 2002/02/05 22:09:04 skud Exp $
+ #
+ 
+-package    CGI::FormMagick::Validator;
++package    CGI::FormMagick::Validator::Length;
+ 
+ =pod
+ 
+diff -Naur perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Network.pm perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Network.pm
+--- perl-CGI-FormMagick-0.91/lib/CGI/FormMagick/Validator/Network.pm	2002-12-18 22:27:28.000000000 +0100
++++ perl-CGI-FormMagick-0.91.oden/lib/CGI/FormMagick/Validator/Network.pm	2005-11-06 14:17:20.000000000 +0100
+@@ -9,7 +9,7 @@
+ # $Id: Network.pm,v 1.9 2002/06/24 17:55:14 skud Exp $
+ #
+ 
+-package    CGI::FormMagick::Validator;
++package    CGI::FormMagick::Validator::Network;
+ use strict;
+ use Mail::RFC822::Address;
+ 

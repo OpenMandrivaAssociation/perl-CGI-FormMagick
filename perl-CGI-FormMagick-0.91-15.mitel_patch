@@ -1,0 +1,38 @@
+Index: perl-CGI-FormMagick/FormMagick.dtd
+diff -u perl-CGI-FormMagick/FormMagick.dtd:1.4 perl-CGI-FormMagick/FormMagick.dtd:1.5
+--- perl-CGI-FormMagick/FormMagick.dtd:1.4	Thu Jul 15 11:49:12 2004
++++ perl-CGI-FormMagick/FormMagick.dtd	Tue Aug  3 11:43:56 2004
+@@ -57,6 +57,7 @@
+ <!ATTLIST FIELD ROWS        CDATA   #IMPLIED    >
+ <!ATTLIST FIELD COLS        CDATA   #IMPLIED    >
+ <!ATTLIST FIELD DISPLAY     CDATA   #IMPLIED    >
++<!ATTLIST FIELD NOTRIM      CDATA   #IMPLIED    >
+ 
+ <!-- An HTML fragment contains CDATA for HTML to put in that place -->
+ 
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.5 perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.6
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm:1.5	Thu Jul 15 11:45:02 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/Validator.pm	Tue Aug  3 11:43:56 2004
+@@ -446,6 +446,21 @@
+             next unless $display;
+         }
+         $self->debug_msg("Validating field...");
++
++        # Trim leading and trailing whitespace from the field data, unless
++        # there is a notrim attr set to true.
++        unless ($info->{notrim})
++        {
++            $self->debug_msg("Trimming whitespace around field $field->{id}");
++            my $data = $self->{cgi}->param($field->{id});
++            if ($data =~ s/^\s+|\s+$//g)
++            {
++                $self->debug_msg("Found whitespace to trim, resaving param");
++                $self->{cgi}->param(-name => $field->{id},
++                                    -value => $data);
++            }
++        }
++
+         my $result = $self->validate_field($field);
+         unless ($result eq "OK") {
+             $errors{$field->{label}} = $result;

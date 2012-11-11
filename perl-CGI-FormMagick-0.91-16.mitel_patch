@@ -1,0 +1,22 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm:1.3 perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm:1.4
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm:1.3	Thu Jul 15 10:52:00 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/Sub.pm	Fri Aug 20 19:42:07 2004
+@@ -254,10 +254,14 @@
+     no strict 'refs'; # Into the Evil Cavern... mwahahahahaaaaaa
+     if ($package)
+     {
+-        my $package_symbols = *{$package . '::'}{HASH};
+-        if (exists $package_symbols->{$sub})
++        my %package_symbols = %{$package . '::'};
++        if (exists $package_symbols{$sub})
+         {
+-            return $package_symbols->{$sub};
++            # Make sure it's a subroutine.
++            if (defined &{ $package_symbols{$sub} })
++            {
++                return $package_symbols{$sub};
++            }
+         }
+     }
+     if ($self && $self->can($sub))

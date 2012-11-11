@@ -1,0 +1,15 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.19 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.20
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.19	Thu Jul 15 11:45:02 2004
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Fri Sep  3 16:05:20 2004
+@@ -390,7 +390,9 @@
+         return;
+     }
+ 
+-    print $self->{cgi}->header;
++    # Print the http response header, making sure that the browser doesn't try
++    # to cache the page.
++    print $self->{cgi}->header(-expires => '-1d');
+     $self->debug_msg("The page number started out as $self->{page_number}");
+ 
+     if (defined $self->{cgi}->param("page_stack")) {

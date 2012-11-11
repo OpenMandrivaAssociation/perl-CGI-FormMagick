@@ -1,0 +1,113 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.12 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.13
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.12	Wed Nov 19 14:24:39 2003
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Mon Jan  5 20:55:41 2004
+@@ -141,7 +141,7 @@
+ ok(CGI::FormMagick->can('new'), "We can call new");
+ ok($fm = CGI::FormMagick->new(type => 'file', source => "t/simple.xml"), "create fm object"); 
+ ok($fm2 = CGI::FormMagick->new(type => 'string', source => '<form></form>',
+-	charset => 'US-ASCII'), 'We can pass charset');
++    charset => 'US-ASCII'), 'We can pass charset');
+ isa_ok($fm, 'CGI::FormMagick');
+ isa_ok($fm2, 'CGI::FormMagick');
+ $fm->parse_xml();
+@@ -151,16 +151,16 @@
+ =cut
+ 
+ sub new {
+-    my $self 		= shift;
++    my $self        = shift;
+     my $class = ref($self) || $self;
+     $self = bless {}, $class;
+ 
+-    my %args 		= @_;
++    my %args        = @_;
+ 
+ 
+-    $self->{debug} 	= $args{DEBUG} 		|| 0;
+-#    $self->{inputtype} 	= uc($args{type}) 	|| "file";
+-    $self->{inputtype} 	= $args{type} 	|| "file";
++    $self->{debug}  = $args{DEBUG}      || 0;
++#    $self->{inputtype}     = uc($args{type})   || "file";
++    $self->{inputtype}  = $args{type}   || "file";
+     $self->{source}     = $args{source};
+     $self->{charset}    = $args{charset} || undef;
+ 
+@@ -171,7 +171,7 @@
+         } else {
+             $self->{lc($_)} = 1;
+         }
+-    }	
++    }   
+ 
+     #$self->{sessiondir} = initialise_sessiondir($args{SESSIONDIR});
+     $self->{calling_package} = (caller)[0]; 
+@@ -378,8 +378,8 @@
+     my $skip = $ashash->{skip_header} ? 1 : 0;
+ 
+     if ($skip) {
+-	$self->page_post_event;
+-	return;
++    $self->page_post_event;
++    return;
+     }
+ 
+     print $self->{cgi}->header;
+@@ -414,8 +414,8 @@
+     $self->print_form_header();
+ 
+     if ($self->finished()) {
+-	$self->validate_all();
+-	$self->form_post_event();
++    $self->validate_all();
++    $self->form_post_event();
+     } else {
+         $self->page_pre_event(); 
+         $self->print_page();
+@@ -1026,8 +1026,8 @@
+ 
+     my ($self, $fieldinfo) = @_;
+ 
+-    my @option_labels;		# labels for items in a list
+-    my @option_values;		# the values hidden behind those labels
++    my @option_labels;      # labels for items in a list
++    my @option_values;      # the values hidden behind those labels
+ 
+     $self->debug_msg(
+         "Options attribute appears to be '"
+@@ -1083,16 +1083,16 @@
+ 
+     $self->debug_msg("options field looks like $options_field");
+ 
+-    if ($options_field =~ /=>/) {			# user supplied a hash	
++    if ($options_field =~ /=>/) {           # user supplied a hash  
+         $self->debug_msg("options_ref should be a hashref");
+-        $options_ref = { eval $options_field };	# make options_ref a hashref
+-    } elsif ($options_field =~ /,/) {		# user supplied an array
++        $options_ref = { eval $options_field }; # make options_ref a hashref
++    } elsif ($options_field =~ /,/) {       # user supplied an array
+         $self->debug_msg("options ref should be an arrayref");
+-        $options_ref = [ eval $options_field ];	# make options_ref an arrayref
++        $options_ref = [ eval $options_field ]; # make options_ref an arrayref
+         $self->debug_msg("we have " . scalar(@$options_ref) . " elements");
+-    } else {					# user supplied a sub name
++    } else {                    # user supplied a sub name
+         $self->debug_msg("i think i should call an external routine");
+-        $options_field =~ s/\(.*\)$//;		# strip parens
++        $options_field =~ s/\(.*\)$//;      # strip parens
+         $options_ref = $self->do_external_routine($options_field);
+     }
+     return $options_ref;
+Index: perl-CGI-FormMagick/lib/CGI/FormMagick/Utils.pm
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick/Utils.pm:1.2 perl-CGI-FormMagick/lib/CGI/FormMagick/Utils.pm:1.3
+--- perl-CGI-FormMagick/lib/CGI/FormMagick/Utils.pm:1.2	Wed Dec 18 16:27:28 2002
++++ perl-CGI-FormMagick/lib/CGI/FormMagick/Utils.pm	Mon Jan  5 22:35:57 2004
+@@ -430,7 +430,7 @@
+ 	    return 'multipart/form-data';
+ 	}
+     }
+-    return 'application/x-www-urlencoded';
++    return 'application/x-www-form-urlencoded';
+ }
+ 
+ =head2 $self->clear_navigation_params()

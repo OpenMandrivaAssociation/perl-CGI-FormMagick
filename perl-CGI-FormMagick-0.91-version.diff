@@ -1,0 +1,11 @@
+--- lib/CGI/FormMagick.pm	2003-05-06 20:13:19.000000000 +0200
++++ lib/CGI/FormMagick.pm.oden	2005-11-06 14:04:01.000000000 +0100
+@@ -10,7 +10,7 @@
+ 
+ package    CGI::FormMagick;
+ 
+-my $VERSION = $VERSION = "0.89";
++my $VERSION = $VERSION = "0.91";
+ 
+ use XML::Parser;
+ use Text::Template;

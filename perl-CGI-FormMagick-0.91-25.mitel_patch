@@ -1,0 +1,20 @@
+Index: perl-CGI-FormMagick/perl-CGI-FormMagick.spec
+diff -u perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.22 perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.23
+--- perl-CGI-FormMagick/lib/CGI/FormMagick.pm:1.22	Tue May 17 15:21:25 2005
++++ perl-CGI-FormMagick/lib/CGI/FormMagick.pm	Fri May 20 16:34:24 2005
+@@ -1144,13 +1144,13 @@
+     if ($options_field =~ /=>/) {           # user supplied a hash  
+         $self->debug_msg("options_ref should be a hashref");
+         $options_ref = { eval $options_field }; # make options_ref a hashref
+-    } elsif ($options_field =~ /,/) {       # user supplied an array
++    } elsif ($options_field =~ /,/ and not $options_field =~ /\(/) {
++        # user supplied an array
+         $self->debug_msg("options ref should be an arrayref");
+         $options_ref = [ eval $options_field ]; # make options_ref an arrayref
+         $self->debug_msg("we have " . scalar(@$options_ref) . " elements");
+     } else {                    # user supplied a sub name
+         $self->debug_msg("i think i should call an external routine");
+-        $options_field =~ s/\(.*\)$//;      # strip parens
+         $options_ref = $self->do_external_routine($options_field);
+     }
+     return $options_ref;

@@ -15,7 +15,7 @@ Summary:	CGI-FormMagick module for perl
 License:	GPL+ or Artistic
 Group:		Development/Perl
 # http://sourceforge.net/projects/formmagick/
-Url:		http://search.cpan.org/dist/%{upstream_name}
+Url:		https://search.cpan.org/dist/%{upstream_name}
 # http://gd.tuwien.ac.at/platform/linux/e-smith/devel/SRPMS/perl-CGI-FormMagick-0.91-26.src.rpm
 Source0:	perl-%{upstream_name}-%{upstream_version}.tar.bz2
 Patch0:		perl-CGI-FormMagick-0.91-02.mitel_patch

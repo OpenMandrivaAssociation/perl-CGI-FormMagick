@@ -42,6 +42,7 @@ Patch20:	perl-CGI-FormMagick-0.91-25.mitel_patch
 Patch100:	perl-CGI-FormMagick-0.91-export_names.diff
 Patch101:	perl-CGI-FormMagick-0.91-version.diff
 
+BuildRequires:	make
 BuildRequires:	perl-devel
 BuildRequires:	perl(CGI::Persistent)
 BuildRequires:	perl(Text::Iconv)

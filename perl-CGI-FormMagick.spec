@@ -1,5 +1,5 @@
 %define upstream_name    CGI-FormMagick
-%define upstream_version 0.91
+%define upstream_version 0.89
 
 %if %{_use_internal_dependency_generator}
 %define __noautoreq 'perl\\(Ness::ted\\)'
@@ -8,16 +8,16 @@
 %endif
 
 Name:		perl-%{upstream_name}
-Version:	%perl_convert_version %{upstream_version}
-Release:	5
+Version:	%{upstream_version}
+Release:	1
 
 Summary:	CGI-FormMagick module for perl 
 License:	GPL+ or Artistic
 Group:		Development/Perl
 # http://sourceforge.net/projects/formmagick/
-Url:		https://search.cpan.org/dist/%{upstream_name}
+Url:		https://metacpan.org/dist/CGI-FormMagick
 # http://gd.tuwien.ac.at/platform/linux/e-smith/devel/SRPMS/perl-CGI-FormMagick-0.91-26.src.rpm
-Source0:	perl-%{upstream_name}-%{upstream_version}.tar.bz2
+Source0:	https://cpan.metacpan.org/authors/id/M/MI/MITEL/CGI-FormMagick-%{upstream_version}.tar.gz
 Patch0:		perl-CGI-FormMagick-0.91-02.mitel_patch
 Patch1:		perl-CGI-FormMagick-0.91-03.mitel_patch
 Patch2:		perl-CGI-FormMagick-0.91-04.mitel_patch

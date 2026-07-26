@@ -1,6 +1,4 @@
 %define upstream_name    CGI-FormMagick
-%define upstream_version 0.89
-
 %if %{_use_internal_dependency_generator}
 %define __noautoreq 'perl\\(Ness::ted\\)'
 %else
@@ -8,8 +6,8 @@
 %endif
 
 Name:		perl-%{upstream_name}
-Version:	%{upstream_version}
-Release:	1
+Version:	0.89
+Release:	2
 
 Summary:	CGI-FormMagick module for perl 
 License:	GPL+ or Artistic
@@ -17,7 +15,7 @@ Group:		Development/Perl
 # http://sourceforge.net/projects/formmagick/
 Url:		https://metacpan.org/dist/CGI-FormMagick
 # http://gd.tuwien.ac.at/platform/linux/e-smith/devel/SRPMS/perl-CGI-FormMagick-0.91-26.src.rpm
-Source0:	https://cpan.metacpan.org/authors/id/M/MI/MITEL/CGI-FormMagick-%{upstream_version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/M/MI/MITEL/CGI-FormMagick-%{version}.tar.gz
 Patch0:		perl-CGI-FormMagick-0.91-02.mitel_patch
 Patch1:		perl-CGI-FormMagick-0.91-03.mitel_patch
 Patch2:		perl-CGI-FormMagick-0.91-04.mitel_patch
@@ -62,7 +60,7 @@ multi-page "wizard" style form using XML, then display that form using
 only a few lines of Perl.
 
 %prep
-%setup -q -n perl-%{upstream_name}-%{upstream_version}
+%setup -q -n perl-%{upstream_name}-%{version}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -111,9 +109,7 @@ perl Makefile.PL INSTALLDIRS=vendor
 
 * Wed Jul 29 2009 JÃ©rÃ´me Quelin <jquelin@mandriva.org> 0.910.0-1mdv2011.0
 + Revision: 402998
-- rebuild using %%perl_convert_version
-
-* Wed Jul 30 2008 Thierry Vignaud <tv@mandriva.org> 0.91-6mdv2009.0
+- rebuild using %0.89 Wed Jul 30 2008 Thierry Vignaud <tv@mandriva.org> 0.91-6mdv2009.0
 + Revision: 255772
 - rebuild
 
